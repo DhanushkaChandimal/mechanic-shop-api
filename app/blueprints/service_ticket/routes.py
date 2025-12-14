@@ -2,7 +2,7 @@ from flask import request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy import select
 from .schemas import ticket_schema, tickets_schema
-from app.models import ServiceTicket, db
+from app.models import ServiceTicket, Mechanic, db
 from . import tickets_bp
 
 # CREATE SERVICE TICKET
@@ -65,3 +65,41 @@ def delete_ticket(ticket_id):
     db.session.delete(ticket)
     db.session.commit()
     return jsonify({"message": f'Ticket id: {ticket_id}, successfully deleted.'}), 200
+
+# ASSIGN MECHANIC TO SERVICE TICKET
+@tickets_bp.route("/<int:ticket_id>/assign-mechanic/<int:mechanic_id>", methods=['PUT'])
+def assign_mechanic(ticket_id, mechanic_id):
+    ticket = db.session.get(ServiceTicket, ticket_id)
+    if not ticket:
+        return jsonify({"error": "Service ticket not found."}), 404
+    
+    mechanic = db.session.get(Mechanic, mechanic_id)
+    if not mechanic:
+        return jsonify({"error": "Mechanic not found."}), 404
+    
+    if mechanic in ticket.mechanics:
+        return jsonify({"error": "Mechanic already assigned to this ticket."}), 400
+    
+    ticket.mechanics.append(mechanic)
+    db.session.commit()
+    
+    return jsonify({"message": f'Mechanic {mechanic_id}, successfully assigned to service ticket {ticket_id}.'}), 200
+
+# REMOVE MECHANIC FROM SERVICE TICKET
+@tickets_bp.route("/<int:ticket_id>/remove-mechanic/<int:mechanic_id>", methods=['PUT'])
+def remove_mechanic(ticket_id, mechanic_id):
+    ticket = db.session.get(ServiceTicket, ticket_id)
+    if not ticket:
+        return jsonify({"error": "Service ticket not found."}), 404
+    
+    mechanic = db.session.get(Mechanic, mechanic_id)
+    if not mechanic:
+        return jsonify({"error": "Mechanic not found."}), 404
+    
+    if mechanic not in ticket.mechanics:
+        return jsonify({"error": "Mechanic is not assigned to this ticket."}), 400
+    
+    ticket.mechanics.remove(mechanic)
+    db.session.commit()
+    
+    return jsonify({"message": f'Mechanic {mechanic_id}, successfully removed from service ticket {ticket_id}.'}), 200
