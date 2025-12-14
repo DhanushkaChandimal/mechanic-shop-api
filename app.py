@@ -95,6 +95,15 @@ def get_customers():
 
     return customers_schema.jsonify(customers)
 
+#GET SPECIFIC CUSTOMER
+@app.route("/customers/<int:customer_id>", methods=['GET'])
+def get_customer(customer_id):
+    customer = db.session.get(Customer, customer_id)
+
+    if customer:
+        return customer_schema.jsonify(customer), 200
+    return jsonify({"error": "Customer not found."}), 404
+
 # with app.app_context():
 #     db.create_all()
 app.run(debug=True)
