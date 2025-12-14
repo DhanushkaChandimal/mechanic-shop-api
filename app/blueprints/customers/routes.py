@@ -48,11 +48,6 @@ def update_customer(customer_id):
     if not customer:
         return jsonify({"error": "Customer not found."}), 404
     
-    query = select(Customer).where(Customer.email == customer_data['email'])
-    existing_customer = db.session.execute(query).scalars().all()
-    
-    if(existing_customer): return jsonify({"error": "Email already used"}), 400
-    
     try:
         customer_data = customer_schema.load(request.json)
     except ValidationError as e:

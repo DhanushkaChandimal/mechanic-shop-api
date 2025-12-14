@@ -48,11 +48,6 @@ def update_mechanic(mechanic_id):
     if not mechanic:
         return jsonify({"error": "Mechanic not found."}), 404
     
-    query = select(Mechanic).where(Mechanic.email == mechanic_data['email'])
-    existing_mechanic = db.session.execute(query).scalars().all()
-    
-    if(existing_mechanic): return jsonify({"error": "Email already used"}), 400
-    
     try:
         mechanic_data = mechanic_schema.load(request.json)
     except ValidationError as e:
