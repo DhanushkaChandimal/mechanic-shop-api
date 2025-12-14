@@ -4,7 +4,7 @@ from sqlalchemy import select
 from .schemas import customer_schema, customers_schema
 from app.models import Customer, db
 from . import customers_bp
-from app.extensions import limiter
+from app.extensions import limiter, cache
 
 # CREATE CUSTOMER
 @customers_bp.route("/", methods=['POST'])
@@ -27,6 +27,7 @@ def create_customer():
 
 #GET ALL CUSTOMERS
 @customers_bp.route("/", methods=['GET'])
+@cache.cached(timeout=60)
 def get_customers():
     query = select(Customer)
     customers = db.session.execute(query).scalars().all()

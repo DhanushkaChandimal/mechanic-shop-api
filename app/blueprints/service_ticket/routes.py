@@ -4,7 +4,7 @@ from sqlalchemy import select
 from .schemas import ticket_schema, tickets_schema
 from app.models import ServiceTicket, Mechanic, db
 from . import tickets_bp
-from app.extensions import limiter
+from app.extensions import limiter, cache
 
 # CREATE SERVICE TICKET
 @tickets_bp.route("/", methods=['POST'])
@@ -22,6 +22,7 @@ def create_ticket():
 
 #GET ALL SERVICE TICKETS
 @tickets_bp.route("/", methods=['GET'])
+@cache.cached(timeout=60)
 def get_tickets():
     query = select(ServiceTicket)
     tickets = db.session.execute(query).scalars().all()
