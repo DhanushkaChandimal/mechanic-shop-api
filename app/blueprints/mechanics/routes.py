@@ -4,9 +4,11 @@ from sqlalchemy import select
 from .schemas import mechanic_schema, mechanics_schema
 from app.models import Mechanic, db
 from . import mechanics_bp
+from app.extensions import limiter
 
 # CREATE MECHANIC
 @mechanics_bp.route("/", methods=['POST'])
+@limiter.limit("10 per day")
 def create_mechanic():
     try:
         mechanic_data = mechanic_schema.load(request.json)
@@ -42,6 +44,7 @@ def get_mechanic(mechanic_id):
 
 #UPDATE SPECIFIC MECHANIC
 @mechanics_bp.route("/<int:mechanic_id>", methods=['PUT'])
+@limiter.limit("3 per day")
 def update_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanic, mechanic_id)
 
@@ -61,6 +64,7 @@ def update_mechanic(mechanic_id):
 
 #DELETE SPECIFIC MECHANIC
 @mechanics_bp.route("/<int:mechanic_id>", methods=['DELETE'])
+@limiter.limit("3 per day")
 def delete_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanic, mechanic_id)
 
