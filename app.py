@@ -1,9 +1,11 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from datetime import date
 from typing import List
 from flask_marshmallow import Marshmallow
+from marshmallow import ValidationError
+from sqlalchemy import select
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:1234@localhost/mechanic_shop_db'
@@ -64,6 +66,26 @@ class CustomerSchema(ma.SQLAlchemyAutoSchema):
     
 customer_schema =CustomerSchema()
 customers_schema = CustomerSchema(many=True)
+
+# ==========ROUTES==========
+
+# CREATE CUSTOMER
+@app.route("/customers", methods=['POST'])
+def create_customer():
+    try:
+        customer_data = customer_schema.load(request.json)
+    except ValidationError as e:
+        return jsonify(e.messages), 400
+    
+    query = select(Customer).where(Customer.email == customer_data['email'])
+    existing_customer = db.session.execute(query).scalars().all()
+    
+    if(existing_customer): return jsonify({"error": "Email already used"}), 400
+    
+    new_customer = Customer(**customer_data)
+    db.session.add(new_customer)
+    db.session.commit()
+    return customer_schema.jsonify(new_customer), 201
 
 # with app.app_context():
 #     db.create_all()
