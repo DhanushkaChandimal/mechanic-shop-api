@@ -57,6 +57,14 @@ class Mechanic(Base):
     
     service_tickets: Mapped[List['ServiceTicket']] = db.relationship(secondary=ticket_mechanic, back_populates='mechanics')
 
-with app.app_context():
-    db.create_all()
+# ==========SCHEMAS==========
+class CustomerSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Customer
+    
+customer_schema =CustomerSchema()
+customers_schema = CustomerSchema(many=True)
+
+# with app.app_context():
+#     db.create_all()
 app.run(debug=True)
