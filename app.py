@@ -87,6 +87,14 @@ def create_customer():
     db.session.commit()
     return customer_schema.jsonify(new_customer), 201
 
+#GET ALL CUSTOMERS
+@app.route("/customers", methods=['GET'])
+def get_customers():
+    query = select(Customer)
+    customers = db.session.execute(query).scalars().all()
+
+    return customers_schema.jsonify(customers)
+
 # with app.app_context():
 #     db.create_all()
 app.run(debug=True)
