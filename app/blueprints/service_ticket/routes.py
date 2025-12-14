@@ -8,7 +8,7 @@ from app.extensions import limiter, cache
 
 # CREATE SERVICE TICKET
 @tickets_bp.route("/", methods=['POST'])
-@limiter.limit("100 per hour")
+@limiter.limit("30 per hour")
 def create_ticket():
     try:
         ticket_data = ticket_schema.load(request.json)
@@ -40,7 +40,7 @@ def get_ticket(ticket_id):
 
 #UPDATE SPECIFIC SERVICE TICKET
 @tickets_bp.route("/<int:ticket_id>", methods=['PUT'])
-@limiter.limit("100 per hour")
+@limiter.limit("30 per hour")
 def update_ticket(ticket_id):
     ticket = db.session.get(ServiceTicket, ticket_id)
 
@@ -73,7 +73,7 @@ def delete_ticket(ticket_id):
 
 # ASSIGN MECHANIC TO SERVICE TICKET
 @tickets_bp.route("/<int:ticket_id>/assign-mechanic/<int:mechanic_id>", methods=['PUT'])
-@limiter.limit("500 per hour")
+@limiter.limit("150 per hour")
 def assign_mechanic(ticket_id, mechanic_id):
     ticket = db.session.get(ServiceTicket, ticket_id)
     if not ticket:
@@ -93,7 +93,7 @@ def assign_mechanic(ticket_id, mechanic_id):
 
 # REMOVE MECHANIC FROM SERVICE TICKET
 @tickets_bp.route("/<int:ticket_id>/remove-mechanic/<int:mechanic_id>", methods=['PUT'])
-@limiter.limit("250 per hour")
+@limiter.limit("75 per hour")
 def remove_mechanic(ticket_id, mechanic_id):
     ticket = db.session.get(ServiceTicket, ticket_id)
     if not ticket:

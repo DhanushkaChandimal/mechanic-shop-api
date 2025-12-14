@@ -4,5 +4,8 @@ from flask_limiter.util import get_remote_address
 from flask_caching import Cache
 
 ma = Marshmallow()
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["1000 per day", "150 per hour"],
+)
 cache = Cache()
