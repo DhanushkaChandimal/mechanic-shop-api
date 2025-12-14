@@ -4,9 +4,11 @@ from sqlalchemy import select
 from .schemas import customer_schema, customers_schema
 from app.models import Customer, db
 from . import customers_bp
+from app.extensions import limiter
 
 # CREATE CUSTOMER
 @customers_bp.route("/", methods=['POST'])
+@limiter.limit("5 per hour")
 def create_customer():
     try:
         customer_data = customer_schema.load(request.json)
@@ -42,6 +44,7 @@ def get_customer(customer_id):
 
 #UPDATE SPECIFIC CUSTOMER
 @customers_bp.route("/<int:customer_id>", methods=['PUT'])
+@limiter.limit("10 per day")
 def update_customer(customer_id):
     customer = db.session.get(Customer, customer_id)
 
@@ -61,6 +64,7 @@ def update_customer(customer_id):
 
 #DELETE SPECIFIC CUSTOMER
 @customers_bp.route("/<int:customer_id>", methods=['DELETE'])
+@limiter.limit("5 per day")
 def delete_customer(customer_id):
     customer = db.session.get(Customer, customer_id)
 
