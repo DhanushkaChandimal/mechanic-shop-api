@@ -2,9 +2,10 @@ from flask import request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy import select
 from .schemas import ticket_schema, tickets_schema
-from app.models import ServiceTicket, Mechanic, db
+from app.models import ServiceTicket, Mechanic, Customer, db
 from . import tickets_bp
 from app.extensions import limiter, cache
+from app.utils.util import token_required
 
 # CREATE SERVICE TICKET
 @tickets_bp.route("/", methods=['POST'])
@@ -14,6 +15,10 @@ def create_ticket():
         ticket_data = ticket_schema.load(request.json)
     except ValidationError as e:
         return jsonify(e.messages), 400
+    
+    customer = db.session.get(Customer, ticket_data.get('customer_id'))
+    if not customer:
+        return jsonify({"error": "Customer not found. Please provide a valid customer_id."}), 404
     
     new_ticket = ServiceTicket(**ticket_data)
     db.session.add(new_ticket)
@@ -37,6 +42,17 @@ def get_ticket(ticket_id):
     if ticket:
         return ticket_schema.jsonify(ticket), 200
     return jsonify({"error": "Ticket not found."}), 404
+
+#GET SERVICE TICKETS BY CUSTOMER
+@tickets_bp.route("/my-tickets", methods=['GET'])
+@token_required
+def get_tickets_by_customer(customer_id):
+    query =select(ServiceTicket).where(ServiceTicket.customer_id == customer_id) 
+    tickets = db.session.execute(query).scalars().all()
+
+    if tickets:
+        return tickets_schema.jsonify(tickets), 200
+    return jsonify({"error": "No tickets associated with you"}), 404
 
 #UPDATE SPECIFIC SERVICE TICKET
 @tickets_bp.route("/<int:ticket_id>", methods=['PUT'])
