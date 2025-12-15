@@ -5,7 +5,7 @@ from .schemas import customer_schema, customers_schema, login_schema
 from app.models import Customer, db
 from . import customers_bp
 from app.extensions import limiter, cache
-from app.utils.util import encode_token
+from app.utils.util import encode_token, token_required
 
 @customers_bp.route("/login", methods=['POST'])
 def login():
@@ -70,7 +70,8 @@ def get_customer(customer_id):
     return jsonify({"error": "Customer not found."}), 404
 
 #UPDATE SPECIFIC CUSTOMER
-@customers_bp.route("/<int:customer_id>", methods=['PUT'])
+@customers_bp.route("/", methods=['PUT'])
+@token_required
 @limiter.limit("10 per day")
 def update_customer(customer_id):
     customer = db.session.get(Customer, customer_id)
@@ -90,7 +91,8 @@ def update_customer(customer_id):
     return customer_schema.jsonify(customer), 200
 
 #DELETE SPECIFIC CUSTOMER
-@customers_bp.route("/<int:customer_id>", methods=['DELETE'])
+@customers_bp.route("/", methods=['DELETE'])
+@token_required
 @limiter.limit("5 per day")
 def delete_customer(customer_id):
     customer = db.session.get(Customer, customer_id)
