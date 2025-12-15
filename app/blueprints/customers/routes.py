@@ -1,10 +1,36 @@
 from flask import request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy import select
-from .schemas import customer_schema, customers_schema
+from .schemas import customer_schema, customers_schema, login_schema
 from app.models import Customer, db
 from . import customers_bp
 from app.extensions import limiter, cache
+from app.utils.util import encode_token
+
+@customers_bp.route("/login", methods=['POST'])
+def login():
+    try:
+        credentials = login_schema.load(request.json)
+        email = credentials['email']
+        password = credentials['password']
+    except ValidationError as e:
+        return jsonify(e.messages), 400
+    
+    query =select(Customer).where(Customer.email == email) 
+    user = db.session.execute(query).scalars().first() #Query user table for a user with this email
+
+    if user and user.password == password: #if we have a user associated with the username, validate the password
+        token = encode_token(user.id)
+
+        response = {
+            "status": "success",
+            "message": "Successfully Logged In",
+            "token": token
+        }
+        
+        return jsonify(response), 200
+    else:
+        return jsonify({'message': "Invalid email or password"}), 401
 
 # CREATE CUSTOMER
 @customers_bp.route("/", methods=['POST'])
