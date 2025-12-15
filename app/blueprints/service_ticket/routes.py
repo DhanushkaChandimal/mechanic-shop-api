@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy import select
-from .schemas import ticket_schema, tickets_schema
+from .schemas import ticket_schema, tickets_schema, edit_ticket_schema
 from app.models import ServiceTicket, Mechanic, Customer, db
 from . import tickets_bp
 from app.extensions import limiter, cache
@@ -47,32 +47,12 @@ def get_ticket(ticket_id):
 @tickets_bp.route("/my-tickets", methods=['GET'])
 @token_required
 def get_tickets_by_customer(customer_id):
-    query =select(ServiceTicket).where(ServiceTicket.customer_id == customer_id) 
+    query = select(ServiceTicket).where(ServiceTicket.customer_id == customer_id) 
     tickets = db.session.execute(query).scalars().all()
 
     if tickets:
         return tickets_schema.jsonify(tickets), 200
     return jsonify({"error": "No tickets associated with you"}), 404
-
-#UPDATE SPECIFIC SERVICE TICKET
-@tickets_bp.route("/<int:ticket_id>", methods=['PUT'])
-@limiter.limit("30 per hour")
-def update_ticket(ticket_id):
-    ticket = db.session.get(ServiceTicket, ticket_id)
-
-    if not ticket:
-        return jsonify({"error": "Ticket not found."}), 404
-    
-    try:
-        ticket_data = ticket_schema.load(request.json)
-    except ValidationError as e:
-        return jsonify(e.messages), 400
-    
-    for key, value in ticket_data.items():
-        setattr(ticket, key, value)
-
-    db.session.commit()
-    return ticket_schema.jsonify(ticket), 200
 
 #DELETE SPECIFIC SERVICE TICKET
 @tickets_bp.route("/<int:ticket_id>", methods=['DELETE'])
@@ -87,42 +67,29 @@ def delete_ticket(ticket_id):
     db.session.commit()
     return jsonify({"message": f'Ticket id: {ticket_id}, successfully deleted.'}), 200
 
-# ASSIGN MECHANIC TO SERVICE TICKET
-@tickets_bp.route("/<int:ticket_id>/assign-mechanic/<int:mechanic_id>", methods=['PUT'])
-@limiter.limit("150 per hour")
-def assign_mechanic(ticket_id, mechanic_id):
-    ticket = db.session.get(ServiceTicket, ticket_id)
-    if not ticket:
-        return jsonify({"error": "Service ticket not found."}), 404
+@tickets_bp.route("/<int:ticket_id>/edit", methods=['PUT'])
+def edit_ticket(ticket_id):
+    try:
+        ticket_edits = edit_ticket_schema.load(request.json)
+    except ValidationError as e:
+        return jsonify(e.messages), 400
     
-    mechanic = db.session.get(Mechanic, mechanic_id)
-    if not mechanic:
-        return jsonify({"error": "Mechanic not found."}), 404
+    query = select(ServiceTicket).where(ServiceTicket.id == ticket_id) 
+    ticket = db.session.execute(query).scalars().first()
     
-    if mechanic in ticket.mechanics:
-        return jsonify({"error": "Mechanic already assigned to this ticket."}), 400
-    
-    ticket.mechanics.append(mechanic)
-    db.session.commit()
-    
-    return jsonify({"message": f'Mechanic {mechanic_id}, successfully assigned to service ticket {ticket_id}.'}), 200
+    for mechanic_id in ticket_edits['add_mechanic_ids']:
+        query = select(Mechanic).where(Mechanic.id == mechanic_id)
+        mechanic = db.session.execute(query).scalars().first()
+        
+        if mechanic and mechanic not in ticket.mechanics:
+            ticket.mechanics.append(mechanic)
 
-# REMOVE MECHANIC FROM SERVICE TICKET
-@tickets_bp.route("/<int:ticket_id>/remove-mechanic/<int:mechanic_id>", methods=['PUT'])
-@limiter.limit("75 per hour")
-def remove_mechanic(ticket_id, mechanic_id):
-    ticket = db.session.get(ServiceTicket, ticket_id)
-    if not ticket:
-        return jsonify({"error": "Service ticket not found."}), 404
-    
-    mechanic = db.session.get(Mechanic, mechanic_id)
-    if not mechanic:
-        return jsonify({"error": "Mechanic not found."}), 404
-    
-    if mechanic not in ticket.mechanics:
-        return jsonify({"error": "Mechanic is not assigned to this ticket."}), 400
-    
-    ticket.mechanics.remove(mechanic)
+    for mechanic_id in ticket_edits['remove_mechanic_ids']:
+        query = select(Mechanic).where(Mechanic.id == mechanic_id)
+        mechanic = db.session.execute(query).scalars().first()
+        
+        if mechanic and mechanic in ticket.mechanics:
+            ticket.mechanics.remove(mechanic)
+
     db.session.commit()
-    
-    return jsonify({"message": f'Mechanic {mechanic_id}, successfully removed from service ticket {ticket_id}.'}), 200
+    return ticket_schema.jsonify(ticket)
