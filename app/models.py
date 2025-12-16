@@ -50,8 +50,8 @@ class Mechanic(Base):
     
     service_tickets: Mapped[List['ServiceTicket']] = db.relationship(secondary=ticket_mechanic, back_populates='mechanics')    
 
-class Inventory(Base):
-    __tablename__ = 'inventory'
+class Item(Base):
+    __tablename__ = 'items'
     
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(db.String(255), nullable=False)
