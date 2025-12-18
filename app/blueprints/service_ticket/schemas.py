@@ -1,21 +1,20 @@
 from app.extensions import ma
-from app.models import ServiceTicket, ServiceItems
+from app.models import ServiceTicket, ServiceItems, Item
 from marshmallow import fields
 
-class ServiceItemsSchema(ma.SQLAlchemyAutoSchema):
-    item = fields.Nested('ItemSchema', dump_only=True)
-    
-    class Meta:
-        model = ServiceItems
-        include_fk = True
+class ItemInTicketSchema(ma.Schema):
+    id = fields.Int(attribute='item.id')
+    name = fields.Str(attribute='item.name')
+    price = fields.Float(attribute='item.price')
+    quantity = fields.Int()
 
 class TicketSchema(ma.SQLAlchemyAutoSchema):
     mechanics = fields.Nested('MechanicSchema', many=True, dump_only=True)
-    service_items = fields.Nested(ServiceItemsSchema, many=True, dump_only=True)
+    items = fields.Nested(ItemInTicketSchema, many=True, attribute='service_items', dump_only=True)
+    customer_id = fields.Int()
     
     class Meta:
         model = ServiceTicket
-        include_relationships = True
 
 class EditTicketSchema(ma.Schema):
     add_mechanic_ids = fields.List(fields.Int(), required=True)
