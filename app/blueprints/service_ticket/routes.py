@@ -2,7 +2,7 @@ from flask import request, jsonify
 from marshmallow import ValidationError
 from sqlalchemy import select
 from .schemas import ticket_schema, tickets_schema, edit_ticket_schema
-from app.models import ServiceTicket, Mechanic, Customer, db
+from app.models import ServiceTicket, Mechanic, Customer, db, Item, ServiceItems
 from . import tickets_bp
 from app.extensions import limiter, cache
 from app.utils.util import token_required
@@ -27,7 +27,7 @@ def create_ticket():
 
 #GET ALL SERVICE TICKETS
 @tickets_bp.route("/", methods=['GET'])
-@cache.cached(timeout=60)
+# @cache.cached(timeout=60)
 def get_tickets():
     query = select(ServiceTicket)
     tickets = db.session.execute(query).scalars().all()
@@ -90,6 +90,42 @@ def edit_ticket(ticket_id):
         
         if mechanic and mechanic in ticket.mechanics:
             ticket.mechanics.remove(mechanic)
+
+    db.session.commit()
+    return ticket_schema.jsonify(ticket)
+
+@tickets_bp.route("/add-part/<int:item_id>/to-ticket/<int:ticket_id>", methods=['PUT'])
+def add_part_to_ticket(item_id, ticket_id):
+    query = select(ServiceTicket).where(ServiceTicket.id == ticket_id) 
+    ticket = db.session.execute(query).scalars().first()
+    
+    if not ticket:
+        return jsonify({"error": "Ticket not found."}), 404
+    
+    query = select(Item).where(Item.id == item_id)
+    part = db.session.execute(query).scalars().first()
+    
+    if not part:
+        return jsonify({"error": "Part not found."}), 404
+    
+    # Check if item already exists in this ticket
+    query = select(ServiceItems).where(
+        ServiceItems.service_id == ticket_id,
+        ServiceItems.item_id == item_id
+    )
+    existing_service_item = db.session.execute(query).scalar_one_or_none()
+    
+    if existing_service_item:
+        # Increment quantity if already exists
+        existing_service_item.quantity += 1
+    else:
+        # Create new ServiceItems entry with quantity 1
+        new_service_item = ServiceItems(
+            service_id=ticket_id,
+            item_id=item_id,
+            quantity=1
+        )
+        db.session.add(new_service_item)
 
     db.session.commit()
     return ticket_schema.jsonify(ticket)
