@@ -27,13 +27,13 @@ paths:
       parameters:
         - in: "body"
           name: "body"
-          description: "Login Credentials"
+          description: "Login credentials"
           required: true
           schema:
             $ref: "#/definitions/LoginCredentials"
       responses:
         200:
-          description: "Login successful"
+          description: "Login Successful"
           schema:
             $ref: "#/definitions/LoginResponse"
           examples:
@@ -95,7 +95,7 @@ paths:
             $ref: "#/definitions/UpdateCustomerPayload"
       responses:
         200:
-          descriptions: "Successfully Updated customer"
+          descriptions: "Successfully Updated Customer"
           schema:
             $ref: "#/definitions/UpdateCustomerResponse"
           examples:
@@ -105,6 +105,22 @@ paths:
               name: John Doe
               password: password123
               phone: 555-555-5555
+
+    delete:
+      tags:
+        - Customers
+      summary: "Enpoint to delete a customer"
+      description: "Endpoint to delete a customer. Requires token authentication, customer must be logged in to delete their account"
+      security:
+       - bearerAuth: []
+      responses:
+        200:
+          description: "Successfully Deleted Customer"           
+          schema:
+            $ref: "#/definitions/DeleteCustomerResponse"
+          examples:
+            application/json:
+              message: "Customer id: <customer_id>, successfully deleted."
 
 definitions: 
 
@@ -208,4 +224,10 @@ definitions:
       password:
         type: "string"
       phone:
+        type: "string"
+
+  DeleteCustomerResponse:
+    type: "object"
+    properties:
+      message:
         type: "string"
