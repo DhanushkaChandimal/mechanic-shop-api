@@ -54,7 +54,7 @@ paths:
           description: "Information required to create a new Customer."
           required: true
           schema:
-            $ref: "#/definitions/CreateCustomerPayload"
+            $ref: "#/definitions/CustomerPayload"
       responses:
         201:
           descriptions: "Successfull Customer Creation"
@@ -105,7 +105,7 @@ paths:
           description: "Information required to update a customer."
           required: true
           schema:
-            $ref: "#/definitions/UpdateCustomerPayload"
+            $ref: "#/definitions/CustomerPayload"
       responses:
         200:
           descriptions: "Successfully Updated Customer"
@@ -153,6 +153,125 @@ paths:
           schema:
             $ref: "#/definitions/CustomerResponse"
 
+  /mechanics:
+    post:
+      tags:
+        - Mechanics
+      summary: "Create a new mechanic."
+      description: "Endpoint to create a new mechanic in our Mechanic shop, emails must be unique."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to create a new mechanic."
+          required: true
+          schema:
+            $ref: "#/definitions/MechanicPayload"
+      responses:
+        201:
+          descriptions: "Successfull Mechanic Creation"
+          schema:
+            $ref: "#/definitions/MechanicResponse"
+          examples:
+            application/json:
+              address: 123 1st street
+              email: johnd@email.com
+              id: 1
+              name: John Doe
+              phone: 555-555-5555
+              salary: 500
+
+    get:
+      tags:
+        - Mechanics
+      summary: "Returns all mechanics"
+      description: "Endpoint to retrieve a list of all mechanics."
+      responses:
+        200:
+          description: "Retrieved Mechanics Successfully"
+          schema:
+            $ref: "#/definitions/AllMechanics"
+
+  /mechanics/{id}:
+    get:
+      tags:
+        - Mechanics
+      summary: "Get specific mechanic"
+      description: "Endpoint to get a specific mechanic using mechanic id."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Mechanic ID"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Retrieved Mechanic Successfully"
+          schema:
+            $ref: "#/definitions/MechanicResponse"
+
+    put:
+      tags:
+        - Mechanics
+      summary: "Update a mechanic."
+      description: "Endpoint to update a mechanic."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Mechanic ID"
+          required: true
+          type: "integer"
+        - in: "body"
+          name: "body"
+          description: "Information required to update a mechanic."
+          required: true
+          schema:
+            $ref: "#/definitions/MechanicPayload"
+      responses:
+        200:
+          descriptions: "Successfully Updated Mechanic"
+          schema:
+            $ref: "#/definitions/MechanicResponse"
+          examples:
+            application/json:
+              address: 123 1st street
+              email: johnd@email.com
+              id: 1
+              name: John Doe
+              phone: 555-555-5555
+              salary: 500
+
+    delete:
+      tags:
+        - Mechanics
+      summary: "Delete a mechanic"
+      description: "Endpoint to delete a mechanic."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Mechanic ID"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Successfully Deleted Mechanic"
+          schema:
+            $ref: "#/definitions/DeleteMechanicResponse"
+          examples:
+            application/json:
+              message: "Mechanic id: <mechanic_id>, successfully deleted."
+
+  /mechanics/most-worked:
+    get:
+      tags:
+        - Mechanics
+      summary: "Get most worked mechanics"
+      description: "Endpoint to retrieve all mechanics sorted by number of service tickets worked, from most to least."
+      responses:
+        200:
+          description: "Retrieved Mechanics Successfully"
+          schema:
+            $ref: "#/definitions/AllMechanics"
+
 definitions:
 
   LoginCredentials:
@@ -177,7 +296,7 @@ definitions:
       status:
         type: "string"
 
-  CreateCustomerPayload:
+  CustomerPayload:
     type: "object"
     properties:
       name:
@@ -225,25 +344,71 @@ definitions:
         phone:
           type: "string"
 
-  UpdateCustomerPayload:
+  DeleteCustomerResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+
+  MechanicPayload:
     type: "object"
     properties:
       name:
         type: "string"
       email:
         type: "string"
+      address:
+        type: "string"
       phone:
         type: "string"
-      password:
-        type: "string"
+      salary:
+        type: "number"
+        format: "float"
 
     required:
       - name
       - email
+      - address
       - phone
-      - password
+      - salary
 
-  DeleteCustomerResponse:
+  MechanicResponse:
+    type: "object"
+    properties:
+      address:
+        type: "string"
+      email:
+        type: "string"
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      phone:
+        type: "string"
+      salary:
+        type: "number"
+        format: "float"
+
+  AllMechanics:
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        address:
+          type: "string"
+        email:
+          type: "string"
+        id:
+          type: "integer"
+        name:
+          type: "string"
+        phone:
+          type: "string"
+        salary:
+          type: "number"
+          format: "float"
+
+  DeleteMechanicResponse:
     type: "object"
     properties:
       message:
