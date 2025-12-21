@@ -272,6 +272,107 @@ paths:
           schema:
             $ref: "#/definitions/AllMechanics"
 
+  /inventory:
+    post:
+      tags:
+        - Inventory Items
+      summary: "Create a new item."
+      description: "Endpoint to create a new item in our Mechanic shop."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to create a new item."
+          required: true
+          schema:
+            $ref: "#/definitions/ItemPayload"
+      responses:
+        201:
+          descriptions: "Successfull Item Creation"
+          schema:
+            $ref: "#/definitions/ItemResponse"
+          examples:
+            application/json:
+              id: 1
+              name: Item 1
+              price: 200
+
+    get:
+      tags:
+        - Inventory Items
+      summary: "Returns all items"
+      description: "Endpoint to retrieve a list of all items."
+      responses:
+        200:
+          description: "Retrieved Items Successfully"
+          schema:
+            $ref: "#/definitions/AllItems"
+
+  /inventory/{id}:
+    get:
+      tags:
+        - Inventory Items
+      summary: "Get specific item"
+      description: "Endpoint to get a specific item using item id."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Item ID"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Retrieved Item Successfully"
+          schema:
+            $ref: "#/definitions/ItemResponse"
+
+    put:
+      tags:
+        - Inventory Items
+      summary: "Update an item."
+      description: "Endpoint to update an item."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Item ID"
+          required: true
+          type: "integer"
+        - in: "body"
+          name: "body"
+          description: "Information required to update an item."
+          required: true
+          schema:
+            $ref: "#/definitions/ItemPayload"
+      responses:
+        200:
+          descriptions: "Successfully Updated Item"
+          schema:
+            $ref: "#/definitions/ItemResponse"
+          examples:
+            application/json:
+              id: 1
+              name: Item 1
+              price: 200
+
+    delete:
+      tags:
+        - Inventory Items
+      summary: "Delete an item"
+      description: "Endpoint to delete an item."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Item ID"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Successfully Deleted Item"
+          schema:
+            $ref: "#/definitions/DeleteItemResponse"
+          examples:
+            application/json:
+              message: "Item with id: <item_id>, successfully deleted."
+
 definitions:
 
   LoginCredentials:
@@ -409,6 +510,49 @@ definitions:
           format: "float"
 
   DeleteMechanicResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+
+  ItemPayload:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      price:
+        type: "number"
+        format: "float"
+
+    required:
+      - name
+      - price
+
+  ItemResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      price:
+        type: "number"
+        format: "float"
+
+  AllItems:
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        name:
+          type: "string"
+        price:
+          type: "number"
+          format: "float"
+
+  DeleteItemResponse:
     type: "object"
     properties:
       message:
