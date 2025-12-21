@@ -373,6 +373,172 @@ paths:
             application/json:
               message: "Item with id: <item_id>, successfully deleted."
 
+  /service-tickets:
+    post:
+      tags:
+        - Service Tickets
+      summary: "Create a new service ticket."
+      description: "Endpoint to create a new service ticket in our Mechanic shop."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to create a new service ticket."
+          required: true
+          schema:
+            $ref: "#/definitions/ServiceTicketPayload"
+      responses:
+        201:
+          descriptions: "Successfull Service Ticket Creation"
+          schema:
+            $ref: "#/definitions/ServiceTicketResponse"
+          examples:
+            application/json:
+              customer_id: 2
+              id: 1
+              items: []
+              mechanics: []
+              service_date: "2025-12-29"
+              service_description: "description 1"
+              vin: "12548121..."
+
+    get:
+      tags:
+        - Service Tickets
+      summary: "Returns all service tickets"
+      description: "Endpoint to retrieve a list of all service tickets."
+      responses:
+        200:
+          description: "Retrieved Service Tickets Successfully"
+          schema:
+            $ref: "#/definitions/AllServiceTickets"
+
+  /service-tickets/{id}:
+    get:
+      tags:
+        - Service Tickets
+      summary: "Get specific service ticket"
+      description: "Endpoint to get a specific service ticket using service ticket id."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Service Ticket ID"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Retrieved Service Ticket Successfully"
+          schema:
+            $ref: "#/definitions/ServiceTicketResponse"
+
+    delete:
+      tags:
+        - Service Tickets
+      summary: "Delete a service ticket"
+      description: "Endpoint to delete a service ticket."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Service Ticket ID"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Successfully Deleted Service Ticket"
+          schema:
+            $ref: "#/definitions/DeleteResponse"
+          examples:
+            application/json:
+              message: "Ticket id: <ticket_id>, successfully deleted."
+
+  /service-tickets/my-tickets:
+    get:
+      tags:
+        - Service Tickets
+      summary: "Get authenticated customer's service tickets"
+      description: "Endpoint to retrieve all service tickets associated with the currently logged-in customer. Requires JWT authentication."
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: "Retrieved Service Tickets Successfully"
+          schema:
+            $ref: "#/definitions/AllServiceTickets"
+
+  /service-tickets/{id}/edit:
+    put:
+      tags:
+        - Service Tickets
+      summary: "Update mechanic assignments for service ticket"
+      description: "Endpoint to add or remove mechanics assigned to a specific service ticket by providing lists of mechanic IDs to add and remove."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Service Ticket ID"
+          required: true
+          type: "integer"
+        - in: "body"
+          name: "body"
+          description: "Lists of mechanic IDs to add to and remove from the service ticket."
+          required: true
+          schema:
+            $ref: "#/definitions/AddOrRemoveMechanicsToServiceTicketPayload"
+      responses:
+        200:
+          descriptions: "Successfully Updated Service Ticket"
+          schema:
+            $ref: "#/definitions/ItemResponse"
+          examples:
+            application/json:
+              customer_id: 2
+              id: 1
+              items: []
+              mechanics:
+                - address: 123 1st street
+                  email: johnd@email.com
+                  id: 1
+                  name: John Doe
+                  phone: 555-555-5555
+                  salary: 500
+              service_date: "2025-12-29"
+              service_description: "description 1"
+              vin: "12548121..."
+
+  /service-tickets/add-part/{part_id}/to-ticket/{ticket_id}:
+    put:
+      tags:
+        - Service Tickets
+      summary: "Add item to service ticket"
+      description: "Endpoint to add an inventory item/part to a service ticket. If the item already exists on the ticket, the quantity will be incremented by 1."
+      parameters:
+        - in: "path"
+          name: "part_id"
+          description: "Part ID"
+          required: true
+          type: "integer"
+        - in: "path"
+          name: "ticket_id"
+          description: "Service Ticket ID"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          descriptions: "Successfully Updated Service Ticket"
+          schema:
+            $ref: "#/definitions/ItemResponse"
+          examples:
+            application/json:
+              customer_id: 2
+              id: 1
+              items:
+                - id: 1
+                  name: "item 1 updated"
+                  price: 500.0
+                  quantity: 1
+              mechanics: []
+              service_date: "2025-12-29"
+              service_description: "description 1"
+              vin: "12548121..."
+
 definitions:
 
   LoginCredentials:
@@ -545,3 +711,128 @@ definitions:
         price:
           type: "number"
           format: "float"
+
+  ServiceTicketPayload:
+    type: "object"
+    properties:
+      vin:
+        type: "string"
+      service_date:
+        type: "string"
+        format: date
+      service_description:
+        type: "string"
+      customer_id:
+        type: "integer"
+
+    required:
+      - name
+      - price
+
+  ServiceTicketResponse:
+    type: "object"
+    properties:
+      customer_id:
+        type: "integer"
+      id:
+        type: "integer"
+      items:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            id:
+              type: "integer"
+            name:
+              type: "string"
+            price:
+              type: "number"
+              format: "float"
+            quantity:
+              type: "integer"
+      mechanics:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            address:
+              type: "string"
+            email:
+              type: "string"
+            id:
+              type: "integer"
+            name:
+              type: "string"
+            phone:
+              type: "string"
+            salary:
+              type: "number"
+              format: "float"
+      service_date:
+        type: "string"
+        format: date
+      service_description:
+        type: "string"
+      vin:
+        type: "string"
+
+  AllServiceTickets:
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        customer_id:
+          type: "integer"
+        id:
+          type: "integer"
+        items:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+              name:
+                type: "string"
+              price:
+                type: "number"
+                format: "float"
+              quantity:
+                type: "integer"
+        mechanics:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              address:
+                type: "string"
+              email:
+                type: "string"
+              id:
+                type: "integer"
+              name:
+                type: "string"
+              phone:
+                type: "string"
+              salary:
+                type: "number"
+                format: "float"
+        service_date:
+          type: "string"
+          format: date
+        service_description:
+          type: "string"
+        vin:
+          type: "string"
+
+  AddOrRemoveMechanicsToServiceTicketPayload:
+    type: "object"
+    properties:
+      add_mechanic_ids:
+        type: "array"
+        items:
+          type: "integer"
+      remove_mechanic_ids:
+        type: "array"
+        items:
+          type: "integer"
