@@ -130,7 +130,7 @@ paths:
         200:
           description: "Successfully Deleted Customer"
           schema:
-            $ref: "#/definitions/DeleteCustomerResponse"
+            $ref: "#/definitions/DeleteResponse"
           examples:
             application/json:
               message: "Customer id: <customer_id>, successfully deleted."
@@ -255,7 +255,7 @@ paths:
         200:
           description: "Successfully Deleted Mechanic"
           schema:
-            $ref: "#/definitions/DeleteMechanicResponse"
+            $ref: "#/definitions/DeleteResponse"
           examples:
             application/json:
               message: "Mechanic id: <mechanic_id>, successfully deleted."
@@ -368,7 +368,7 @@ paths:
         200:
           description: "Successfully Deleted Item"
           schema:
-            $ref: "#/definitions/DeleteItemResponse"
+            $ref: "#/definitions/DeleteResponse"
           examples:
             application/json:
               message: "Item with id: <item_id>, successfully deleted."
@@ -445,7 +445,7 @@ definitions:
         phone:
           type: "string"
 
-  DeleteCustomerResponse:
+  DeleteResponse:
     type: "object"
     properties:
       message:
@@ -509,12 +509,6 @@ definitions:
           type: "number"
           format: "float"
 
-  DeleteMechanicResponse:
-    type: "object"
-    properties:
-      message:
-        type: "string"
-
   ItemPayload:
     type: "object"
     properties:
@@ -551,9 +545,3 @@ definitions:
         price:
           type: "number"
           format: "float"
-
-  DeleteItemResponse:
-    type: "object"
-    properties:
-      message:
-        type: "string"
