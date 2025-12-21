@@ -21,3 +21,14 @@ class TestCustomer(unittest.TestCase):
         response = self.client.post('/customers/', json=customer_payload)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json['name'], "John Doe")
+    
+    def test_invalid_customer_creation(self):
+        customer_payload = {
+            "name": "John Doe",
+            "phone": "123-456-7890",
+            "password": "123"       
+        }
+
+        response = self.client.post('/customers/', json=customer_payload)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json['email'], ['Missing data for required field.'])
