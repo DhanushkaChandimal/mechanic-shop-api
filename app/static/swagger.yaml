@@ -59,7 +59,7 @@ paths:
         201:
           descriptions: "Successfull Customer Creation"
           schema:
-            $ref: "#/definitions/CreateCustomerResponse"
+            $ref: "#/definitions/CustomerResponse"
           examples:
             application/json:
               email: johnd@email.com
@@ -75,11 +75,11 @@ paths:
       description: "Endpoint to retrieve a list of all customers."
       responses:
         200:
-          description: "Retrieved Customers Successfully"           
+          description: "Retrieved Customers Successfully"
           schema:
-            $ref: "#/definitions/AllCustomers"   
+            $ref: "#/definitions/AllCustomers"
 
-    put: 
+    put:
       tags:
         - Customers
       summary: "Endpoint to update a customer."
@@ -97,7 +97,7 @@ paths:
         200:
           descriptions: "Successfully Updated Customer"
           schema:
-            $ref: "#/definitions/UpdateCustomerResponse"
+            $ref: "#/definitions/CustomerResponse"
           examples:
             application/json:
               email: johnd@email.com
@@ -115,14 +115,32 @@ paths:
        - bearerAuth: []
       responses:
         200:
-          description: "Successfully Deleted Customer"           
+          description: "Successfully Deleted Customer"
           schema:
             $ref: "#/definitions/DeleteCustomerResponse"
           examples:
             application/json:
               message: "Customer id: <customer_id>, successfully deleted."
 
-definitions: 
+  /customers/{id}:
+    get:
+      tags:
+        - Customers
+      summary: "Get specific customer"
+      description: "Endpoint to get a specific customer using customer id."
+      parameters:
+        - in: "path"
+          name: "id"
+          description: "Customer ID"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Retrieved Customer Successfully"
+          schema:
+            $ref: "#/definitions/CustomerResponse"
+
+definitions:
 
   LoginCredentials:
     type: "object"
@@ -131,11 +149,11 @@ definitions:
         type: "string"
       password:
         type: "string"
-      
+
     required:
       - email
       - password
-    
+
   LoginResponse:
     type: "object"
     properties:
@@ -157,20 +175,20 @@ definitions:
         type: "string"
       password:
         type: "string"
-      
+
     required:
       - name
       - email
       - phone
       - password
 
-  CreateCustomerResponse:
+  CustomerResponse:
     type: "object"
     properties:
       email:
         type: "string"
       id:
-        type: "int"
+        type: "integer"
       name:
         type: "string"
       password:
@@ -205,26 +223,12 @@ definitions:
         type: "string"
       password:
         type: "string"
-      
+
     required:
       - name
       - email
       - phone
       - password
-
-  UpdateCustomerResponse:
-    type: "object"
-    properties:
-      email:
-        type: "string"
-      id:
-        type: "int"
-      name:
-        type: "string"
-      password:
-        type: "string"
-      phone:
-        type: "string"
 
   DeleteCustomerResponse:
     type: "object"
