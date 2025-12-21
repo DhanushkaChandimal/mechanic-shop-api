@@ -34,6 +34,32 @@ paths:
               message: "Successfully Logged In"
               status: "success"
               token: "eyJhbGciOiJIUzI1NiIsInR5cCI6I..."
+  
+  /customers:
+    post:
+      tags:
+        - Customers
+      summary: "Endpoint to create / register a new customer."
+      description: "Endpoint to create a new customer in our Mechanic shop, emails must be unique."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to create a new Customer."
+          required: true
+          schema:
+            $ref: "#/definitions/CreateCustomerPayload"
+      responses:
+        201:
+          descriptions: "Successfull Customer Creation"
+          schema:
+            $ref: "#/definitions/CreateCustomerResponse"
+          examples:
+            application/json:
+              id: 1
+              name: John Doe
+              phone: 555-555-5555
+              email: johnd@email.com
+              password: password123
 
 definitions: 
 
@@ -59,3 +85,34 @@ definitions:
       status:
         type: "string"
 
+  CreateCustomerPayload:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "string"
+      password:
+        type: "string"
+      
+    required:
+      - name
+      - email
+      - phone
+      - password
+
+  CreateCustomerResponse:
+    type: "object"
+    properties:
+      id:
+        type: "int"
+      name:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "string"
+      password:
+        type: "string"
