@@ -10,7 +10,31 @@ consumes:
   - "application/json"
 produces:
   - "application/json"
-paths: {}
+paths:
+  /customers/login:
+    post:
+      tags:
+        - Customers
+      summary: "Login endpoint, (generates token)"
+      description: "Validates customer credentials, generates and return a customer specific token."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Login Credentials"
+          required: true
+          schema:
+            $ref: "#/definitions/LoginCredentials"
+      responses:
+        200:
+          description: "Login successful"
+          schema:
+            $ref: "#/definitions/LoginResponse"
+          examples:
+            application/json:
+              message: "Successfully Logged In"
+              status: "success"
+              token: "eyJhbGciOiJIUzI1NiIsInR5cCI6I..."
+
 definitions: 
 
   LoginCredentials:
