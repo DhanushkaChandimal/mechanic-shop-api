@@ -10,6 +10,13 @@ consumes:
   - "application/json"
 produces:
   - "application/json"
+
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+
 paths:
   /customers/login:
     post:
@@ -55,11 +62,11 @@ paths:
             $ref: "#/definitions/CreateCustomerResponse"
           examples:
             application/json:
+              email: johnd@email.com
               id: 1
               name: John Doe
-              phone: 555-555-5555
-              email: johnd@email.com
               password: password123
+              phone: 555-555-5555
 
     get:
       tags:
@@ -71,6 +78,33 @@ paths:
           description: "Retrieved Customers Successfully"           
           schema:
             $ref: "#/definitions/AllCustomers"   
+
+    put: 
+      tags:
+        - Customers
+      summary: "Endpoint to update a customer."
+      description: "Endpoint to update a customer, this is a token authenticated route, and the customer must be logged in to update their account."
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Information required to update a customer."
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateCustomerPayload"
+      responses:
+        200:
+          descriptions: "Successfully Updated customer"
+          schema:
+            $ref: "#/definitions/UpdateCustomerResponse"
+          examples:
+            application/json:
+              email: johnd@email.com
+              id: 1
+              name: John Doe
+              password: password123
+              phone: 555-555-5555
 
 definitions: 
 
@@ -117,15 +151,15 @@ definitions:
   CreateCustomerResponse:
     type: "object"
     properties:
+      email:
+        type: "string"
       id:
         type: "int"
       name:
         type: "string"
-      email:
+      password:
         type: "string"
       phone:
-        type: "string"
-      password:
         type: "string"
 
   AllCustomers:
@@ -143,3 +177,35 @@ definitions:
           type: "string"
         phone:
           type: "string"
+
+  UpdateCustomerPayload:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"
+      phone:
+        type: "string"
+      password:
+        type: "string"
+      
+    required:
+      - name
+      - email
+      - phone
+      - password
+
+  UpdateCustomerResponse:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      id:
+        type: "int"
+      name:
+        type: "string"
+      password:
+        type: "string"
+      phone:
+        type: "string"
