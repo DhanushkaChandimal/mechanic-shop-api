@@ -34,7 +34,7 @@ paths:
               message: "Successfully Logged In"
               status: "success"
               token: "eyJhbGciOiJIUzI1NiIsInR5cCI6I..."
-  
+
   /customers:
     post:
       tags:
@@ -60,6 +60,17 @@ paths:
               phone: 555-555-5555
               email: johnd@email.com
               password: password123
+
+    get:
+      tags:
+        - Customers
+      summary: "Returns all customers"
+      description: "Endpoint to retrieve a list of all customers."
+      responses:
+        200:
+          description: "Retrieved Customers Successfully"           
+          schema:
+            $ref: "#/definitions/AllCustomers"   
 
 definitions: 
 
@@ -116,3 +127,19 @@ definitions:
         type: "string"
       password:
         type: "string"
+
+  AllCustomers:
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+        id:
+          type: "integer"
+        name:
+          type: "string"
+        password:
+          type: "string"
+        phone:
+          type: "string"
