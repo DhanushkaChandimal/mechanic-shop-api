@@ -72,7 +72,20 @@ paths:
       tags:
         - Customers
       summary: "Returns all customers"
-      description: "Endpoint to retrieve a list of all customers."
+      description: "Endpoint to retrieve a list of all customers with pagination support."
+      parameters:
+        - in: "query"
+          name: "page"
+          description: "Page number for pagination"
+          required: false
+          type: "integer"
+          default: 1
+        - in: "query"
+          name: "per_page"
+          description: "Number of customers per page"
+          required: false
+          type: "integer"
+          default: 5
       responses:
         200:
           description: "Retrieved Customers Successfully"
