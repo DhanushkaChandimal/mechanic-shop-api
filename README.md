@@ -63,7 +63,10 @@ mechanic-shop-api/
 │   ├── test_mechanics.py
 │   ├── test_items.py
 │   └── test_service_tickets.py
-├── app.py
+├── .github/
+│   └── workflows/
+│       └── main.yaml
+├── flask_app.py
 ├── config.py
 ├── requirements.txt
 └── README.md
@@ -91,7 +94,7 @@ mechanic-shop-api/
 
 4. **Configure the database**
    - Update `config.py` with your database connection string
-   - Uncomment the database creation code in `app.py` (first run only):
+   - Uncomment the database creation code in `flask_app.py` (first run only):
    ```python
    with app.app_context():
        db.create_all()
@@ -99,7 +102,7 @@ mechanic-shop-api/
 
 5. **Run the application**
    ```bash
-   python app.py
+   python flask_app.py
    ```
 
 The API will be available at `http://localhost:5000`
@@ -131,11 +134,12 @@ The API will be available at `http://localhost:5000`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/mechanics/` | Create a new mechanic |
+| POST | `/mechanics/` | Create a new mechanic (rate limited: 10/day) |
 | GET | `/mechanics/` | Get all mechanics |
 | GET | `/mechanics/<id>` | Get a specific mechanic |
-| PUT | `/mechanics/<id>` | Update a mechanic |
-| DELETE | `/mechanics/<id>` | Delete a mechanic |
+| GET | `/mechanics/most-worked` | Get mechanics sorted by number of service tickets (most to least) |
+| PUT | `/mechanics/<id>` | Update a mechanic (rate limited: 3/day) |
+| DELETE | `/mechanics/<id>` | Delete a mechanic (rate limited: 3/day) |
 
 **Example Request (POST `/mechanics/`):**
 ```json
@@ -248,6 +252,9 @@ Some endpoints have rate limits to prevent abuse:
 - `POST /customers/`: 5 requests per hour
 - `PUT /customers/`: 10 requests per day
 - `DELETE /customers/`: 5 requests per day
+- `POST /mechanics/`: 10 requests per day
+- `PUT /mechanics/<id>`: 3 requests per day
+- `DELETE /mechanics/<id>`: 3 requests per day
 - `POST /service-tickets/`: 30 requests per hour
 - `DELETE /service-tickets/<id>`: 2 requests per hour
 
