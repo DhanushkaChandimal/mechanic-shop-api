@@ -3,9 +3,11 @@ info:
   title: "Mechanic Shop API"
   description: "A RESTful API for managing mechanic shop operations including customers, mechanics, service tickets, and inventory items with JWT authentication and rate limiting."
   version: "1.0.0"
-host: "127.0.0.1:5000"
+# host: "127.0.0.1:5000"
+host: "mechanic-shop-api-5clq.onrender.com"
 schemes:
-  - "http"
+  # - "http"
+  - "https"
 consumes:
   - "application/json"
 produces:
