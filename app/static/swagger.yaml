@@ -57,7 +57,7 @@ paths:
             $ref: "#/definitions/CustomerPayload"
       responses:
         201:
-          descriptions: "Successfull Customer Creation"
+          description: "Successfull Customer Creation"
           schema:
             $ref: "#/definitions/CustomerResponse"
           examples:
@@ -108,7 +108,7 @@ paths:
             $ref: "#/definitions/CustomerPayload"
       responses:
         200:
-          descriptions: "Successfully Updated Customer"
+          description: "Successfully Updated Customer"
           schema:
             $ref: "#/definitions/CustomerResponse"
           examples:
@@ -168,7 +168,7 @@ paths:
             $ref: "#/definitions/MechanicPayload"
       responses:
         201:
-          descriptions: "Successfull Mechanic Creation"
+          description: "Successfull Mechanic Creation"
           schema:
             $ref: "#/definitions/MechanicResponse"
           examples:
@@ -228,7 +228,7 @@ paths:
             $ref: "#/definitions/MechanicPayload"
       responses:
         200:
-          descriptions: "Successfully Updated Mechanic"
+          description: "Successfully Updated Mechanic"
           schema:
             $ref: "#/definitions/MechanicResponse"
           examples:
@@ -287,7 +287,7 @@ paths:
             $ref: "#/definitions/ItemPayload"
       responses:
         201:
-          descriptions: "Successfull Item Creation"
+          description: "Successfull Item Creation"
           schema:
             $ref: "#/definitions/ItemResponse"
           examples:
@@ -344,7 +344,7 @@ paths:
             $ref: "#/definitions/ItemPayload"
       responses:
         200:
-          descriptions: "Successfully Updated Item"
+          description: "Successfully Updated Item"
           schema:
             $ref: "#/definitions/ItemResponse"
           examples:
@@ -388,7 +388,7 @@ paths:
             $ref: "#/definitions/ServiceTicketPayload"
       responses:
         201:
-          descriptions: "Successfull Service Ticket Creation"
+          description: "Successfull Service Ticket Creation"
           schema:
             $ref: "#/definitions/ServiceTicketResponse"
           examples:
@@ -484,7 +484,7 @@ paths:
             $ref: "#/definitions/AddOrRemoveMechanicsToServiceTicketPayload"
       responses:
         200:
-          descriptions: "Successfully Updated Service Ticket"
+          description: "Successfully Updated Service Ticket"
           schema:
             $ref: "#/definitions/ItemResponse"
           examples:
@@ -522,7 +522,7 @@ paths:
           type: "integer"
       responses:
         200:
-          descriptions: "Successfully Updated Service Ticket"
+          description: "Successfully Updated Service Ticket"
           schema:
             $ref: "#/definitions/ItemResponse"
           examples:
@@ -726,8 +726,10 @@ definitions:
         type: "integer"
 
     required:
-      - name
-      - price
+      - vin
+      - service_date
+      - service_description
+      - customer_id
 
   ServiceTicketResponse:
     type: "object"

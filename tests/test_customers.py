@@ -93,3 +93,8 @@ class TestCustomer(unittest.TestCase):
         response = self.client.delete('/customers/', headers=headers)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['message'], 'Customer id: 1, successfully deleted.')
+
+    def test_delete_customer_without_auth(self):
+        response = self.client.delete('/customers/')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json['message'], 'Token is missing!')

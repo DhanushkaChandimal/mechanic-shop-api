@@ -110,11 +110,12 @@ The API will be available at `http://localhost:5000`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/customers/` | Create a new customer (includes JWT token in response) |
+| POST | `/customers/` | Create a new customer (rate limited: 5/hour) |
 | POST | `/customers/login` | Login and receive JWT token |
-| GET | `/customers/` | Get all customers |
+| GET | `/customers/` | Get all customers (supports pagination) |
 | GET | `/customers/<id>` | Get a specific customer |
-| DELETE | `/customers/<id>` | Delete a customer |
+| PUT | `/customers/` | Update authenticated customer (requires JWT) |
+| DELETE | `/customers/` | Delete authenticated customer (requires JWT) |
 
 **Example Request (POST `/customers/`):**
 ```json
@@ -233,6 +234,8 @@ Authorization: Bearer <your_jwt_token>
 
 **Protected Endpoints:**
 - `GET /service-tickets/my-tickets`: Get tickets for the authenticated customer
+- `PUT /customers/`: Update authenticated customer
+- `DELETE /customers/`: Delete authenticated customer
 
 **Getting a Token:**
 1. Create a customer account: `POST /customers/`
@@ -242,6 +245,9 @@ Authorization: Bearer <your_jwt_token>
 ## Rate Limiting
 
 Some endpoints have rate limits to prevent abuse:
+- `POST /customers/`: 5 requests per hour
+- `PUT /customers/`: 10 requests per day
+- `DELETE /customers/`: 5 requests per day
 - `POST /service-tickets/`: 30 requests per hour
 - `DELETE /service-tickets/<id>`: 2 requests per hour
 
