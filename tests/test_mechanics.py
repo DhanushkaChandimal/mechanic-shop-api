@@ -1,6 +1,7 @@
 from app import create_app
-from app.models import db, Mechanic
+from app.models import db, Mechanic, ServiceTicket, Customer
 import unittest
+from datetime import date
 
 class TestMechanic(unittest.TestCase):
     def setUp(self):
@@ -67,3 +68,42 @@ class TestMechanic(unittest.TestCase):
         response = self.client.delete('/mechanics/1')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['message'], 'Mechanic id: 1, successfully deleted.')
+
+    def test_get_most_worked_mechanics(self):
+        mechanic2 = Mechanic(name="mechanic_2", email="mechanic2@email.com", address="address_2", phone="555-555-5556", salary=300)
+        mechanic3 = Mechanic(name="mechanic_3", email="mechanic3@email.com", address="address_3", phone="555-555-5557", salary=400)
+        
+        customer = Customer(name="test_customer", email="customer@email.com", phone="555-555-5558", password="test")
+        
+        ticket1 = ServiceTicket(vin="VIN111111111111", service_date=date(2025, 12, 21), service_description="Service 1", customer_id=1)
+        ticket2 = ServiceTicket(vin="VIN222222222222", service_date=date(2025, 12, 22), service_description="Service 2", customer_id=1)
+        ticket3 = ServiceTicket(vin="VIN333333333333", service_date=date(2025, 12, 23), service_description="Service 3", customer_id=1)
+        
+        with self.app.app_context():
+            db.session.add(mechanic2)
+            db.session.add(mechanic3)
+            db.session.add(customer)
+            db.session.commit()
+
+            db.session.add(ticket1)
+            db.session.add(ticket2)
+            db.session.add(ticket3)
+            db.session.commit()
+
+            ticket1.mechanics.append(self.mechanic)
+            ticket2.mechanics.append(self.mechanic)
+            ticket3.mechanics.append(self.mechanic)
+            
+            ticket1.mechanics.append(mechanic2)
+            
+            ticket2.mechanics.append(mechanic3)
+            ticket3.mechanics.append(mechanic3)
+            
+            db.session.commit()
+        
+        response = self.client.get('/mechanics/most-worked')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json), 3)
+        self.assertEqual(response.json[0]['name'], 'test_mechanic')
+        self.assertEqual(response.json[1]['name'], 'mechanic_3')
+        self.assertEqual(response.json[2]['name'], 'mechanic_2')
