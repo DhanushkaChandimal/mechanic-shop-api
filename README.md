@@ -37,25 +37,32 @@ mechanic-shop-api/
 │   ├── __init__.py
 │   ├── models.py
 │   ├── extensions.py
-│   └── blueprints/
-│       ├── customers/
-│       │   ├── __init__.py
-│       │   ├── routes.py
-│       │   └── schemas.py
-│       ├── mechanics/
-│       │   ├── __init__.py
-│       │   ├── routes.py
-│       │   └── schemas.py
-│       ├── items/
-│       │   ├── __init__.py
-│       │   ├── routes.py
-│       │   └── schemas.py
-│       └── service_ticket/
-│           ├── __init__.py
-│           ├── routes.py
-│           └── schemas.py
-│   └── utils/
-│       └── util.py
+│   ├── blueprints/
+│   │   ├── customers/
+│   │   │   ├── __init__.py
+│   │   │   ├── routes.py
+│   │   │   └── schemas.py
+│   │   ├── mechanics/
+│   │   │   ├── __init__.py
+│   │   │   ├── routes.py
+│   │   │   └── schemas.py
+│   │   ├── items/
+│   │   │   ├── __init__.py
+│   │   │   ├── routes.py
+│   │   │   └── schemas.py
+│   │   └── service_ticket/
+│   │       ├── __init__.py
+│   │       ├── routes.py
+│   │       └── schemas.py
+│   ├── utils/
+│   │   └── util.py
+│   └── static/
+│       └── swagger.yaml
+├── tests/
+│   ├── test_customers.py
+│   ├── test_mechanics.py
+│   ├── test_items.py
+│   └── test_service_tickets.py
 ├── app.py
 ├── config.py
 ├── requirements.txt
@@ -144,13 +151,13 @@ The API will be available at `http://localhost:5000`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/items/` | Create a new item/part |
-| GET | `/items/` | Get all items |
-| GET | `/items/<id>` | Get a specific item |
-| PUT | `/items/<id>` | Update an item |
-| DELETE | `/items/<id>` | Delete an item |
+| POST | `/inventory/` | Create a new item/part |
+| GET | `/inventory/` | Get all items |
+| GET | `/inventory/<id>` | Get a specific item |
+| PUT | `/inventory/<id>` | Update an item |
+| DELETE | `/inventory/<id>` | Delete an item |
 
-**Example Request (POST `/items/`):**
+**Example Request (POST `/inventory/`):**
 ```json
 {
   "name": "Oil Filter",
@@ -241,6 +248,41 @@ Some endpoints have rate limits to prevent abuse:
 ## Caching
 
 The `GET /service-tickets/` endpoint is cached for 60 seconds to improve performance.
+
+## Testing
+
+The project includes comprehensive unit tests for all endpoints.
+
+### Running Tests
+
+**Run all tests:**
+```bash
+python -m unittest discover tests
+```
+
+**Run specific test file:**
+```bash
+python -m unittest tests.test_customers
+python -m unittest tests.test_mechanics
+python -m unittest tests.test_items
+python -m unittest tests.test_service_tickets
+```
+
+**Run specific test class:**
+```bash
+python -m unittest tests.test_customers.TestCustomer
+```
+
+**Run specific test method:**
+```bash
+python -m unittest tests.test_customers.TestCustomer.test_get_all_customers
+```
+
+## API Documentation
+
+The API includes Swagger/OpenAPI documentation available at:
+- Swagger YAML file: `/app/static/swagger.yaml`
+- View in Swagger Editor: http://127.0.0.1:5000/api/docs/
 
 ## Error Handling
 
